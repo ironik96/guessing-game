@@ -1,21 +1,49 @@
+import HintNumberButtonList from "components/HintNumberButtonList";
+import { useState } from "react";
 import "./App.css";
-import HintNumberButton from "./components/HintNumberButton";
 
-const generateMagicNumber = () => Math.floor(Math.random() * 101);
-let magicNumber = generateMagicNumber();
+const ATTEMPTS = 5;
+
+const generateRandomNumber = () => Math.floor(Math.random() * 101);
+let magicNumber = generateRandomNumber();
+let currentAttempts = ATTEMPTS;
 console.log(magicNumber);
 
 function App() {
   let userNumber = -1;
+  const checkAnswer = (number) => {
+    currentAttempts--;
+    const hintText = document.querySelector("p.hint-text");
+
+    if (number > magicNumber) hintText.innerText = "too high!";
+    if (number < magicNumber) hintText.innerText = "too low!";
+    if (number == magicNumber) {
+      alert("correct!");
+      window.location.reload();
+    } else if (currentAttempts === 0) {
+      alert("you lost");
+      window.location.reload();
+    }
+  };
+
+  const helpNumbers = () => (
+    <HintNumberButtonList
+      generateRandomNumber={generateRandomNumber}
+      checkAnswer={checkAnswer}
+    />
+  );
+  const [Wisdom, setWisdom] = useState(helpNumbers());
   const onClickSlay = () => checkAnswer(userNumber);
   const onClickSurrender = () => {
     window.location.reload();
   };
-  const onClickSeekWisdom = () => {};
-
-  const checkAnswer = (number) => {
-    console.log("user: " + number);
-    if (number == magicNumber) alert("correct!");
+  const onClickSeekWisdom = () => {
+    const helpSection = document.querySelector("div#help-section");
+    if (helpSection.classList.contains("hide-help-section")) {
+      helpSection.classList.remove("hide-help-section");
+      helpSection.classList.add("show-help-section");
+    }
+    setWisdom(helpNumbers());
   };
 
   return (
@@ -24,6 +52,7 @@ function App() {
         <h1>The Ancient</h1>
         <p>scary ancient monster appears!!</p>
         <p> find the number to slay it</p>
+        <p className="hint-text"></p>
         <input
           onChange={(event) => (userNumber = event.target.value)}
           type="number"
@@ -41,50 +70,9 @@ function App() {
             Seek Wisdom
           </button>
         </div>
-        <div className="help-section">
+        <div className="hide-help-section" id="help-section">
           <p>try any of these</p>
-          <div className="help-btn-group">
-            <HintNumberButton
-              number={generateMagicNumber()}
-              checkAnswer={checkAnswer}
-            />
-            <HintNumberButton
-              number={generateMagicNumber()}
-              checkAnswer={checkAnswer}
-            />
-            <HintNumberButton
-              number={generateMagicNumber()}
-              checkAnswer={checkAnswer}
-            />
-            <HintNumberButton
-              number={generateMagicNumber()}
-              checkAnswer={checkAnswer}
-            />
-            <HintNumberButton
-              number={generateMagicNumber()}
-              checkAnswer={checkAnswer}
-            />
-            <HintNumberButton
-              number={generateMagicNumber()}
-              checkAnswer={checkAnswer}
-            />
-            <HintNumberButton
-              number={generateMagicNumber()}
-              checkAnswer={checkAnswer}
-            />
-            <HintNumberButton
-              number={generateMagicNumber()}
-              checkAnswer={checkAnswer}
-            />
-            <HintNumberButton
-              number={generateMagicNumber()}
-              checkAnswer={checkAnswer}
-            />
-            <HintNumberButton
-              number={generateMagicNumber()}
-              checkAnswer={checkAnswer}
-            />
-          </div>
+          <div className="help-btn-group">{helpNumbers()}</div>
         </div>
       </header>
     </div>
